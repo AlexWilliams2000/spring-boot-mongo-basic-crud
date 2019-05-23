@@ -1,0 +1,13 @@
+.gradle
+.settings
+.vscode
+bin
+build
+
+!gradle-wrapper.jar
+
+.classpath
+.project
+*.class
+*.log
+*.jar
