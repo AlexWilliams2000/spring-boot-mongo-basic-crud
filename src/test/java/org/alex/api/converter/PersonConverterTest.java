@@ -1,11 +1,10 @@
 package org.alex.api.converter;
 
-import static org.junit.Assert.assertThat;
 import static java.util.Arrays.asList;
-import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import org.alex.api.dto.PeopleDTO;
 import org.alex.api.dto.PersonDTO;
