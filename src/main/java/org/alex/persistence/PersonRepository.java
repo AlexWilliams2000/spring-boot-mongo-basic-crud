@@ -1,7 +1,5 @@
 package org.alex.persistence;
 
-import java.util.Optional;
-
 import org.alex.service.model.Person;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
