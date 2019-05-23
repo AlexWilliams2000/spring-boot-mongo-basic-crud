@@ -1,0 +1,595 @@
+{
+	"info": {
+		"_postman_id": "77c3b132-4e9f-4170-938f-23374109769b",
+		"name": "Spring Boot App Api Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Pre-Existing People",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c038591d-c26f-4735-b2f7-35d485b15090",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has body with people array\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property('people');",
+							"    // Store the initial state of the People collection as an array of ids - this could get quite big",
+							"    pm.globals.set(\"initialPeopleIds\", peopleJSON.people.map(person => person.id));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/people",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"people"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post a Single Test Person",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "03fc65b4-13a3-4865-a045-3a31968656c9",
+						"exec": [
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Newly created person is returned with an id\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property(\"id\");",
+							"    pm.expect(peopleJSON.id).not.equal(null);",
+							"    pm.expect(peopleJSON).to.have.property(\"fullName\");",
+							"    pm.expect(peopleJSON.fullName).to.equal(\"Fred O'Splinge\");",
+							"    pm.globals.set(\"newPersonId\", peopleJSON.id);",
+							"    pm.globals.set(\"newPersonFullName\", peopleJSON.fullName);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"fullName\": \"Fred O'Splinge\"\n}"
+				},
+				"url": {
+					"raw": "http://{{host}}:{{port}}/person",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"person"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get the New Person By Id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9554efba-1aa6-47d0-a03c-7e33b70cd75c",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Person is returned when searched by id\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property(\"id\");",
+							"    pm.expect(peopleJSON.id).to.equal(pm.globals.get('newPersonId'));",
+							"    pm.expect(peopleJSON).to.have.property(\"fullName\");",
+							"    pm.expect(peopleJSON.fullName).to.equal(\"Fred O'Splinge\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/person/{{newPersonId}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"person",
+						"{{newPersonId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update the New Person",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "94ac54dd-83b1-4331-84a8-30d265fc812e",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"New person's name is updated\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property(\"id\");",
+							"    pm.expect(peopleJSON.id).to.equal(pm.globals.get('newPersonId'));",
+							"    pm.expect(peopleJSON).to.have.property(\"fullName\");",
+							"    pm.expect(peopleJSON.fullName).to.equal(\"Freddy O'Splinge\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"fullName\": \"Freddy O'Splinge\"\n}"
+				},
+				"url": {
+					"raw": "http://{{host}}:{{port}}/person/{{newPersonId}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"person",
+						"{{newPersonId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete the New Person",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5140fef8-fa94-4193-bd82-7e689c2e7162",
+						"exec": [
+							"pm.test(\"Status code is 204\", () => {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"No response body is returned when new person is deleted\", () => {",
+							"    pm.response.to.not.have.jsonBody();",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}:{{port}}/person/{{newPersonId}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"person",
+						"{{newPersonId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Person Has Been Deleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9554efba-1aa6-47d0-a03c-7e33b70cd75c",
+						"exec": [
+							"pm.test(\"Status code is 404\", () => {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Deleted new person is not found when searched by id\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property(\"error\");",
+							"    pm.expect(peopleJSON.error).to.equal(`Person with id: '${pm.globals.get('newPersonId')}' not found.`);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/person/{{newPersonId}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"person",
+						"{{newPersonId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save Test People",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3bcf43e8-70f0-41ea-896a-226b087456a6",
+						"exec": [
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response has body with people array\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property('people');",
+							"    // Store the newly created person ids",
+							"    pm.globals.set(\"newPeopleIds\", peopleJSON.people.map(person => person.id));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"people\": [\n        {\n            \"fullName\": \"Fred O'Splinge\"\n        },\n        {\n            \"fullName\": \"Jemima O'Splinge\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        },\n        {\n            \"fullName\": \"John Smith\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://{{host}}:{{port}}/people",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"people"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find All People By Full Name 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "227ebc74-2aa9-4024-8029-fc8a3e0905bb",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"People are returned when searched by fullName\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property('people');",
+							"    peopleJSON.people.forEach((person) => {",
+							"        pm.expect(person.fullName).to.equal(\"Freddy O'Splinge\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/people?fullName=Freddy O'Splinge",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"people"
+					],
+					"query": [
+						{
+							"key": "fullName",
+							"value": "Freddy O'Splinge"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find All People By Full Name 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1100af0d-b37c-4e99-a864-07fbc9e9a435",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"People are returned when searched by fullName\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property('people');",
+							"    peopleJSON.people.forEach((person) => {",
+							"        pm.expect(person.fullName).to.equal(\"John Smith\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/people?fullName=John Smith",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"people"
+					],
+					"query": [
+						{
+							"key": "fullName",
+							"value": "John Smith"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find All People",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1100af0d-b37c-4e99-a864-07fbc9e9a435",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"All people are returned\", () => {",
+							"    //This only tests for names being present - should count",
+							"    // the results to verify all people are returned",
+							"    const names = [...new Set(pm.response.json().people.map(person => person.fullName))];",
+							"    console.log(`Names is ${names}`);",
+							"    pm.expect([\"Fred O'Splinge\", \"Jemima O'Splinge\", \"John Smith\"].all(name => names.includes(name))).to.equal(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/people",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"people"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete the New People",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5140fef8-fa94-4193-bd82-7e689c2e7162",
+						"exec": [
+							"pm.test(\"Status code is 204\", () => {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"No response body is returned when person is deleted\", () => {",
+							"    pm.response.to.not.have.jsonBody();",
+							"});",
+							"",
+							"if (!pm.globals.get('newPeopleIds').isEmpty()) {",
+							"    postman.setNextRequest('Delete the New People');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1e4274a4-261c-4f48-be68-8ecf70bf7a93",
+						"exec": [
+							"const [personToDeleteId, ...remainingNewPeopleIds] = pm.globals.get('newPeopleIds');",
+							"",
+							"pm.globals.set('personToDeleteId', personToDeleteId);",
+							"pm.globals.set('newPeopleIds', remainingNewPeopleIds);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}:{{port}}/person/{{personToDeleteId}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"person",
+						"{{personToDeleteId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify the Database has Returned to its Original State",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1100af0d-b37c-4e99-a864-07fbc9e9a435",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"List of current ids is equal to list of initial ids\", () => {",
+							"    const peopleJSON = pm.response.json();",
+							"    pm.expect(peopleJSON).to.have.property('people');",
+							"    pm.expect(pm.globals.get(\"initialPeopleIds\").sort() ===   peopleJSON.people.map(person => person.id).sort());",
+							"});",
+							"",
+							"pm.globals.unset(\"initialPeopleIds\");",
+							"pm.globals.unset(\"newPersonId\");",
+							"pm.globals.unset(\"newPersonFullName\");",
+							"pm.globals.unset(\"personToDeleteId\");",
+							"pm.globals.unset(\"newPeopleIds\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:{{port}}/people",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"people"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2a246bc2-2909-48c8-abeb-3f45dfc5278c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a141e4fc-9bbd-4ae9-8b6a-524661ce89dc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
